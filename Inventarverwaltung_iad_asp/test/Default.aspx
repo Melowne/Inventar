@@ -10,9 +10,16 @@
             <h2>Inventardaten ändern</h2>
             <p>
                 Inventardaten erfassen oder ändern 
-            </p>
+            </p><br>
             <p>
-                <a class="btn btn-default" href="Login.aspx">BackEnd starten... &raquo;</a>
+                <a class="btn btn-default" href="Inventarverwaltung/Login.aspx">BackEnd starten... &raquo;</a>
+            </p>
+        </div>
+          <div class="col-md-4">
+            <h2>Sitzplan auswählen</h2>
+            <p>Für jeden Raum wird dynamisch ein Sitzplan aus den Inventur und Anmeldedaten erzeugt.            </p>
+            <p>
+                <a class="btn btn-default" href="Sitzplan/Sitzplaene.aspx">Liste der Sitzpläne anzeigen &raquo;</a>
             </p>
         </div>
     </div>

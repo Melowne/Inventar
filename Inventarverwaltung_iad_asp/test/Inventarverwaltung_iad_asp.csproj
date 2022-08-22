@@ -44,8 +44,23 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.9.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.9\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="IronBarCode, Version=2022.5.0.5918, Culture=neutral, PublicKeyToken=b971bb3971bdf306, processorArchitecture=MSIL">
+      <HintPath>..\packages\BarCode.2022.5.5918\lib\net40\IronBarCode.dll</HintPath>
+    </Reference>
+    <Reference Include="itextsharp, Version=5.5.13.3, Culture=neutral, PublicKeyToken=8354ae6d2174ddca, processorArchitecture=MSIL">
+      <HintPath>..\packages\iTextSharp.5.5.13.3\lib\itextsharp.dll</HintPath>
+    </Reference>
     <Reference Include="Microsoft.Build.Tasks.v4.0" />
     <Reference Include="Microsoft.CSharp" />
+    <Reference Include="PdfSharp, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="PdfSharp.Charting, Version=1.50.5147.0, Culture=neutral, PublicKeyToken=f94615aa0424f9eb, processorArchitecture=MSIL">
+      <HintPath>..\packages\PDFsharp.1.50.5147\lib\net20\PdfSharp.Charting.dll</HintPath>
+    </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -125,8 +140,21 @@
     <Content Include="Content\bootstrap.css.map" />
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
-    <Content Include="Verwaltung.aspx" />
-    <Content Include="Login.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_F1.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_F2.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_F3.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_Liste.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R1.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R2.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R3.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R4.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R5.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R6.aspx" />
+    <Content Include="Sitzplan\Leipzig\SitzplanLE_R7.aspx" />
+    <Content Include="Sitzplan\Sitzplaene.aspx" />
+    <Content Include="Inventarverwaltung\Verwaltung.aspx" />
+    <Content Include="Inventarverwaltung\Login.aspx" />
+    <Content Include="Inventarverwaltung\qr\qr.pdf" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="Scripts\bootstrap.js" />
     <Content Include="Scripts\bootstrap.min.js" />
@@ -172,8 +200,8 @@
       <DependentUpon>About.aspx</DependentUpon>
     </Compile>
     <Compile Include="App_Start\RouteConfig.cs" />
-    <Compile Include="Beamer.cs" />
-    <Compile Include="Computer.cs" />
+    <Compile Include="Inventarverwaltung\Beamer.cs" />
+    <Compile Include="Inventarverwaltung\Computer.cs" />
     <Compile Include="Contact.aspx.cs">
       <DependentUpon>Contact.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -191,9 +219,9 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Inventar.cs" />
-    <Compile Include="Monitor.cs" />
-    <Compile Include="Objekt.cs" />
+    <Compile Include="Inventarverwaltung\Inventar.cs" />
+    <Compile Include="Inventarverwaltung\Monitor.cs" />
+    <Compile Include="Inventarverwaltung\Objekt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -209,8 +237,93 @@
     <Compile Include="Site.Mobile.Master.designer.cs">
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
-    <Compile Include="SqlCon.cs" />
-    <Compile Include="Tisch.cs" />
+    <Compile Include="Sitzplan\FillSitzplan.cs" />
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F1.aspx.cs">
+      <DependentUpon>SitzplanLE_F1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F1.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_F1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F2.aspx.cs">
+      <DependentUpon>SitzplanLE_F2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F2.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_F2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F3.aspx.cs">
+      <DependentUpon>SitzplanLE_F3.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_F3.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_F3.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_Liste.aspx.cs">
+      <DependentUpon>SitzplanLE_Liste.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_Liste.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_Liste.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R1.aspx.cs">
+      <DependentUpon>SitzplanLE_R1.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R1.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R1.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R2.aspx.cs">
+      <DependentUpon>SitzplanLE_R2.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R2.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R2.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R3.aspx.cs">
+      <DependentUpon>SitzplanLE_R3.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R3.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R3.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R4.aspx.cs">
+      <DependentUpon>SitzplanLE_R4.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R4.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R4.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R5.aspx.cs">
+      <DependentUpon>SitzplanLE_R5.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R5.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R5.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R6.aspx.cs">
+      <DependentUpon>SitzplanLE_R6.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R6.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R6.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R7.aspx.cs">
+      <DependentUpon>SitzplanLE_R7.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Leipzig\SitzplanLE_R7.aspx.designer.cs">
+      <DependentUpon>SitzplanLE_R7.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Sitzplan\Sitzplaene.aspx.cs">
+      <DependentUpon>Sitzplaene.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="Sitzplan\Sitzplaene.aspx.designer.cs">
+      <DependentUpon>Sitzplaene.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="Inventarverwaltung\SqlCon.cs" />
+    <Compile Include="Inventarverwaltung\Tisch.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -218,23 +331,24 @@
     <Compile Include="ViewSwitcher.ascx.designer.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
     </Compile>
-    <Compile Include="Verwaltung.aspx.cs">
+    <Compile Include="Inventarverwaltung\Verwaltung.aspx.cs">
       <DependentUpon>Verwaltung.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Verwaltung.aspx.designer.cs">
+    <Compile Include="Inventarverwaltung\Verwaltung.aspx.designer.cs">
       <DependentUpon>Verwaltung.aspx</DependentUpon>
     </Compile>
-    <Compile Include="Login.aspx.cs">
+    <Compile Include="Inventarverwaltung\Login.aspx.cs">
       <DependentUpon>Login.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
     </Compile>
-    <Compile Include="Login.aspx.designer.cs">
+    <Compile Include="Inventarverwaltung\Login.aspx.designer.cs">
       <DependentUpon>Login.aspx</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Sitzplan\Nordhausen\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

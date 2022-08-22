@@ -29,3 +29,38 @@ textarea {
         padding: 0;
     }
 }
+
+.Bankreihe {
+    background-color: ghostwhite;
+    display: flex;
+}
+
+.Benutzername {
+    margin-top: 3px;
+    font-family: Calibri,Tahima;
+    text-align: center;
+    background-color: white;
+    border: solid 1px gray;
+    width: 100px;
+    min-height: 45px;
+    /*padding:5px;
+            margin: 5px;*/
+}
+
+.Computername {
+    background-color: rgb(187,224,227);
+    width: 100px;
+    text-align: center;
+}
+
+.Gang {
+    width: 20px;
+}
+
+.Gang_large {
+    width: 120px;
+}
+
+.Fehlermeldung {
+    color: red;
+}
