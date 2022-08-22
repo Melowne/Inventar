@@ -1,0 +1,809 @@
+CREATE DATABASE IAD_Inventar;
+GO
+CREATE LOGIN Meyer WITH PASSWORD = '****'
+GO
+CREATE LOGIN Mueller WITH PASSWORD = '****'
+GO
+CREATE LOGIN Mustermann WITH PASSWORD = '****'
+GO
+CREATE LOGIN Schmidt WITH PASSWORD = '****'
+GO
+use IAD_Inventar
+go
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'Mueller')
+BEGIN
+CREATE USER [Mueller] FOR LOGIN [Mueller]
+EXEC sp_addrolemember N'db_owner', N'Mueller'
+END;
+GO
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'Meyer')
+BEGIN
+CREATE USER [Meyer] FOR LOGIN [Meyer]
+EXEC sp_addrolemember N'db_owner', N'Meyer'
+END;
+GO
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'Mustermann')
+BEGIN
+CREATE USER [Mustermann] FOR LOGIN [Mustermann]
+EXEC sp_addrolemember N'db_owner', N'Mustermann'
+END;
+GO
+IF NOT EXISTS (SELECT * FROM sys.database_principals WHERE name = N'Schmidt')
+BEGIN
+CREATE USER [Schmidt] FOR LOGIN [Schmidt]
+EXEC sp_addrolemember N'db_owner', N'Schmidt'
+END;
+GO
+
+-----------------------------------------------------------------------------------------
+					--1
+-----------------------------------------------------------------------------------------
+CREATE TABLE Standorte (
+    StandortId tinyint IDENTITY(1,1) not null primary key,
+    Standortname nvarchar(50) not null,
+    StandortKurz nvarchar(2) not null
+);
+INSERT INTO Standorte (Standortname,StandortKurz)
+	VALUES
+	('Leipzig','LE'),
+	('Nordhausen','NO'),
+	('Marburg','MR'),
+	('Erfurt','ER'),
+	('Jena','JE'),	
+	('Berlin','BE');
+
+CREATE TABLE Hersteller (
+    HerstellerId int IDENTITY(1,1) not null primary key,
+    Herstellername nvarchar(50) not null,
+    AnsprechpartnerId int ,
+    SupportLink nvarchar(255) not null
+);
+INSERT INTO Hersteller (Herstellername,AnsprechpartnerId,SupportLink) VALUES
+('IAD',NULL,'http://www.iad.de'),
+('Redlich',NULL,'http://www.google.de'),
+('Wortmann',NULL,'http://www.google.de'),
+('Dell',NULL,'http://www.dell.de'),
+('Lenovo',NULL,'http://www.google.de'),
+('Sitag',NULL,'http://www.google.de'),
+('Casio',NULL,'http://www.casio.de'),
+('BenQ',NULL,'http://www.google.de'),
+('Asus',NULL,'http://www.asus.com'),
+('LG',NULL,'http://www.lg.com'),
+('Alternate',NULL,'http://www.alternate.de'),
+('Samsung',NULL,'http://www.samsung.de'),
+('Iiyama',NULL,'http://www.iiyama.com'),
+('Epson',NULL,'http://www.epson.com'),
+('Crestron',NULL,'http://www.crestron.com'),
+('Aoc',NULL,'http://www.aoc.com'),
+('HP',NULL,'http://www.hp.com'),
+('Terra',NULL,'http://www.terra.com')
+
+create table Kategorie (
+KategorieId tinyint IDENTITY(1,1) not null Primary Key,
+Bezeichnung nvarchar(50),
+)
+INSERT INTO Kategorie (Bezeichnung)
+VALUES
+    ('Computer'),
+    ('Monitor'),
+    ('Beamer'),
+    ('Tisch');
+-----------------------------------------------------------------------------------------
+
+create table Computer(
+	ComputerId int Identity(1,1) not null Primary Key,
+	Computername nvarchar(50),
+	Status tinyint,
+	Prozessor nvarchar(100),
+	RAM tinyint,
+	Grafik nvarchar(100),
+	HDD int,
+	SSD int,
+	Geaendert smalldatetime not null,
+	InventarId int
+)
+create table Monitor(
+	MonitorId int Identity(1,1) Primary Key,
+	HDMI bit,
+	DVI bit,
+	VGA bit,
+	Status tinyint,
+	Geaendert smalldatetime not null,
+	InventarId int
+)
+create table Beamer(
+	BeamerId int Identity(1,1) Primary Key,
+	HDMI bit,
+	DVI bit,
+	VGA bit,
+	Status tinyint,
+	Geaendert smalldatetime not null,
+	InventarId int
+)
+create table Tisch(
+	TischId int Identity(1,1) Primary Key,
+	Laenge float,
+	Breite float,
+	Status tinyint,
+	Geaendert smalldatetime not null,
+	InventarId int
+)
+create table Inventar(
+	InventarId int Identity(1,1) Primary Key,
+	Raum nvarchar(20),
+	Position nvarchar(10),
+	Geaendert smalldatetime,
+	Garantie tinyint,
+	Kaufdatum smalldatetime,
+	KategorieId tinyint Foreign Key References Kategorie(KategorieId),
+	StandortId tinyint Foreign Key References Standorte(StandortId),
+	HerstellerId int Foreign Key References Hersteller(HerstellerId)
+)
+
+create table Inventartracking(
+	TrackingId int Identity(1,1) Primary Key,
+	InventarId int,
+	StandortId tinyint Foreign Key References Standorte(StandortId),
+	KategorieId tinyint Foreign Key References Kategorie(KategorieId),
+	Raum nvarchar(20),
+	Position nvarchar(10),
+	Admin nvarchar(50),
+	Geaendert smalldatetime
+)
+GO
+-----------------------------------------------------------------------------------------
+					--2-Prozeduren und Trigger Insert
+-----------------------------------------------------------------------------------------
+CREATE PROCEDURE dbo.createInventar @Raum nvarchar(20),@Position nvarchar(10),@KategorieId tinyint,@StandortId tinyint,@HersterllerId int
+AS
+insert into Inventar(Raum,Position,Geaendert,Garantie,Kaufdatum,KategorieId,StandortId,HerstellerId)
+values (@Raum,@Position,getdate(),24,getdate(),@KategorieId,@StandortId,@HersterllerId)
+GO
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+CREATE PROCEDURE dbo.createComputer @Computername nvarchar(50),@HerstellerId int, @Raum nvarchar(20),@Position nvarchar(10),@StandortId int
+AS
+exec dbo.createInventar @Raum,@Position,1,@StandortId,@HerstellerId
+declare @invid as int
+select @invid = InventarId from Inventar where InventarId=@@IDENTITY
+insert into Computer(Computername,Status,Prozessor,RAM,Grafik,HDD,SSD,Geaendert,InventarId)
+values (@Computername,1,'i5-7400-CPU-3.00GHz',8,'Geforce-GT-710',500,220,getdate(),@invid)
+GO
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+CREATE PROCEDURE dbo.createMonitor @hdmi bit,@dvi bit,@vga bit,@HerstellerId int, @Raum nvarchar(20),@Position nvarchar(10),@StandortId int
+AS
+exec dbo.createInventar @Raum,@Position,2,@StandortId,@HerstellerId
+declare @invid as int
+select @invid = InventarId from Inventar where InventarId=@@IDENTITY
+insert into Monitor(HDMI,DVI,VGA,Status,Geaendert,InventarId)
+values (@hdmi,@dvi,@vga,1,getdate(),@invid)
+GO
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+CREATE PROCEDURE dbo.createBeamer @hdmi bit,@dvi bit,@vga bit,@HerstellerId int, @Raum nvarchar(20),@Position nvarchar(10),@StandortId int
+AS
+exec dbo.createInventar @Raum,@Position,3,@StandortId,@HerstellerId
+declare @invid as int
+select @invid = InventarId from Inventar where InventarId=@@IDENTITY
+insert into Beamer(HDMI,DVI,VGA,Status,Geaendert,InventarId)
+values (@hdmi,@dvi,@vga,1,getdate(),@invid)
+GO
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+CREATE PROCEDURE dbo.createTisch @Laenge float,@Breite float,@HerstellerId int, @Raum nvarchar(20),@Position nvarchar(10),@StandortId int
+AS
+exec dbo.createInventar @Raum,@Position,4,@StandortId,@HerstellerId
+declare @invid as int
+select @invid = InventarId from Inventar where InventarId=@@IDENTITY
+insert into Tisch(Laenge,Breite,Status,Geaendert,InventarId)
+values (@Laenge,@Breite,1,getdate(),@invid)
+GO
+-----------------------------------------------------------------------
+-----------------------------------------------------------------------
+
+CREATE TRIGGER dbo.tr_insert_tracking 
+   ON  dbo.Inventar
+   AFTER INSERT
+AS 
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @InventarId int
+	DECLARE @StandortId tinyint
+	DECLARE @KategorieId tinyint
+	DECLARE @Raum nvarchar(20)
+	DECLARE @Position nvarchar(10)
+
+	SET @InventarId = (SELECT InventarId FROM inserted)
+	SET @StandortId = (SELECT StandortId FROM inserted)
+	SET @KategorieId = (SELECT KategorieId FROM inserted)
+	SET @Raum = (SELECT Raum FROM inserted)
+	SET @Position = (SELECT Position FROM inserted)
+
+
+	INSERT INTO dbo.Inventartracking
+           (InventarId,
+            StandortId,
+            KategorieId,
+            Raum,
+	    Position,
+	    Admin,
+	    Geaendert
+)
+     VALUES
+           (
+            @InventarId,
+	    @StandortId,
+            @KategorieId,
+            @Raum,
+            @Position,
+	    CURRENT_USER,
+            Getdate())
+END
+GO
+-----------------------------------------------------------------------------------------
+					--3 - TriggerUpdate
+-----------------------------------------------------------------------------------------
+CREATE TRIGGER dbo.tr_update_tracking 
+   ON  dbo.Inventar
+   AFTER UPDATE
+AS 
+BEGIN
+	SET NOCOUNT ON;
+	DECLARE @InventarId int
+	DECLARE @StandortId tinyint
+	DECLARE @KategorieId tinyint
+	DECLARE @Raum nvarchar(20)
+	DECLARE @Position nvarchar(10)
+
+	SET @InventarId = (SELECT InventarId FROM deleted)
+	SET @StandortId = (SELECT StandortId FROM deleted)
+	SET @KategorieId = (SELECT KategorieId FROM deleted)
+	SET @Raum = (SELECT Raum FROM deleted)
+	SET @Position = (SELECT Position FROM deleted)
+
+
+	INSERT INTO dbo.Inventartracking
+           (InventarId,
+            StandortId,
+            KategorieId,
+            Raum,
+	    Position,
+	    Admin,
+	    Geaendert
+)
+     VALUES
+           (
+            @InventarId,
+	    @StandortId,
+            @KategorieId,
+            @Raum,
+            @Position,
+	    CURRENT_USER,
+            Getdate())
+END
+GO
+
+-----------------------------------------------------------------------------------------
+					--4 - INSERTS INVENTAER
+-----------------------------------------------------------------------------------------
+-----------------------------------------------------------
+			--Lager
+-----------------------------------------------------------
+exec dbo.createTisch 120,80,1,'Lager','00',1   
+exec dbo.createTisch 120,80,1,'Lager','00',1   
+exec dbo.createTisch 180,80,1,'Lager','00',1   
+
+exec dbo.createMonitor 0,1,1,9,'Lager','00',1
+exec dbo.createMonitor 0,1,1,9,'Lager','00',1
+exec dbo.createMonitor 0,1,1,13,'Lager','00',1
+exec dbo.createMonitor 0,1,1,10,'Lager','00',1
+
+exec dbo.createComputer 'LE1-IC016',5,'Lager','00',1
+exec dbo.createComputer 'LE1-ZA009',9,'Lager','00',1
+exec dbo.createComputer 'LE1-IC006',5,'Lager','00',1
+-----------------------------------------------------------
+			--F1
+-----------------------------------------------------------
+DECLARE @cnt INT = 0;
+
+WHILE @cnt < 7
+BEGIN
+  exec dbo.createTisch 120,80,1,'F1','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 70,70,1,'F1','00',1  
+  ---------------------------------------------------
+set @cnt = 0;
+WHILE @cnt < 3
+BEGIN
+  exec dbo.createMonitor 0,1,1,16,'F1','00',1
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createMonitor 1,1,1,10,'F1','00',1
+exec dbo.createBeamer 1,0,1,7,'F1','00',1
+
+exec dbo.createComputer 'LE1-IC002',5,'F1','03',1
+exec dbo.createComputer 'LE1-IC011',5,'F1','01',1
+exec dbo.createComputer 'LE1-IC003',5,'F1','02',1  
+
+-----------------------------------------------------------
+			--F2
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 10
+BEGIN
+  exec dbo.createTisch 120,80,1,'F2','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 70,70,1,'F2','00',1  
+
+set @cnt = 0;
+WHILE @cnt < 3
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'F2','00',1
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createMonitor 1,1,1,16,'F2','00',1
+exec dbo.createBeamer 1,0,1,7,'F2','00',1
+
+exec dbo.createComputer 'LE1-ZP011',5,'F2','00',1
+exec dbo.createComputer 'LE1-ZP012',5,'F2','02',1
+
+-----------------------------------------------------------
+			--F3
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 3
+BEGIN
+  exec dbo.createTisch 180,80,1,'F3','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 120,80,1,'F3','00',1
+exec dbo.createTisch 120,80,1,'F3','00',1
+  
+set @cnt = 0;
+WHILE @cnt < 7
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'F3','00',1
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createMonitor 1,1,1,16,'F3','00',1
+exec dbo.createBeamer 1,0,1,15,'F3','00',1
+
+exec dbo.createComputer 'LE1-CM031',5,'F3','02',1
+exec dbo.createComputer 'LE1-CM020',5,'F3','03',1
+exec dbo.createComputer 'LE1-LX015',5,'F3','00',1
+exec dbo.createComputer 'LE1-CM014',5,'F3','01',1
+
+-----------------------------------------------------------
+			--R7
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 9
+BEGIN
+  exec dbo.createTisch 120,80,1,'R7','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 180,80,1,'R7','00',1
+    
+set @cnt = 0;
+WHILE @cnt < 4
+BEGIN
+  exec dbo.createMonitor 1,1,1,16,'R7','00',1
+  SET @cnt = @cnt + 1;
+END;
+
+set @cnt = 0;
+WHILE @cnt < 5
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'R7','00',1
+  SET @cnt = @cnt + 1;
+END;
+ exec dbo.createMonitor 0,0,1,18,'R7','00',1
+  exec dbo.createBeamer 1,1,1,14,'R7','00',1
+
+exec dbo.createComputer 'LE1-IC001',5,'R7','09',1
+exec dbo.createComputer 'LE1-IC009',5,'R7','03',1
+exec dbo.createComputer 'LE1-ZP008',5,'R7','04',1
+exec dbo.createComputer 'LE1-IC005',5,'R7','06',1
+exec dbo.createComputer 'LE1-IC014',5,'R7','07',1
+exec dbo.createComputer 'LE1-LX020',5,'R7','00',1
+exec dbo.createComputer 'LE1-IC013',5,'R7','01',1
+exec dbo.createComputer 'LE1-IC015',5,'R7','05',1
+
+-----------------------------------------------------------
+			--R6
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 4
+BEGIN
+  exec dbo.createTisch 180,80,1,'R6','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 120,80,1,'R6','00',1
+exec dbo.createTisch 120,80,1,'R6','00',1
+    
+set @cnt = 0;
+WHILE @cnt < 9
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'R6','00',1
+  SET @cnt = @cnt + 1;
+END;
+ 
+exec dbo.createMonitor 1,1,1,16,'R6','00',1
+exec dbo.createBeamer 1,0,1,7,'R6','00',1
+
+exec dbo.createComputer 'LE1-CM003',5,'R6','01',1
+exec dbo.createComputer 'LE1-CM017',5,'R6','00',1
+exec dbo.createComputer 'LE1-CM032',5,'R6','04',1
+exec dbo.createComputer 'LE1-CM023',5,'R6','05',1
+exec dbo.createComputer 'LE1-CM027',5,'R6','08',1
+
+-----------------------------------------------------------
+			--R5
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 4
+BEGIN
+  exec dbo.createTisch 180,80,1,'R5','00',1  
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createTisch 120,80,1,'R5','00',1
+    
+set @cnt = 0;
+WHILE @cnt < 9
+BEGIN
+  exec dbo.createMonitor 1,1,1,13,'R5','00',1
+  SET @cnt = @cnt + 1;
+END;
+ 
+exec dbo.createMonitor 0,1,1,10,'R5','00',1
+exec dbo.createBeamer 1,0,1,7,'R5','00',1
+
+exec dbo.createComputer 'LE1-ZA003',5,'R5','00',1
+exec dbo.createComputer 'LE1-LX013',5,'R5','03',1
+exec dbo.createComputer 'LE1-LX021',5,'R5','07',1
+exec dbo.createComputer 'LE1-ZA007',5,'R5','01',1
+exec dbo.createComputer 'LE1-LX018',5,'R5','05',1
+
+
+-----------------------------------------------------------
+			--R4
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 20
+BEGIN
+  exec dbo.createTisch 120,80,1,'R4','00',1  
+  SET @cnt = @cnt + 1;
+END;
+  
+set @cnt = 0;
+WHILE @cnt < 12
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'R4','00',1
+  SET @cnt = @cnt + 1;
+END;
+set @cnt = 0;
+WHILE @cnt < 10
+BEGIN
+  exec dbo.createMonitor 1,1,1,16,'R4','00',1
+  SET @cnt = @cnt + 1;
+END;
+
+exec dbo.createMonitor 1,1,1,13,'R4','00',1
+exec dbo.createMonitor 0,1,1,9,'R4','00',1
+exec dbo.createBeamer 1,1,1,14,'R4','00',1
+
+exec dbo.createComputer 'LE1-CM029',9,'R4','00',1
+exec dbo.createComputer 'LE1-ZP001',9,'R4','01',1
+exec dbo.createComputer 'LE1-ZP016',9,'R4','03',1
+exec dbo.createComputer 'LE1-ZP015',9,'R4','05',1
+exec dbo.createComputer 'LE1-ZP006',9,'R4','08',1
+exec dbo.createComputer 'LE1-ZP007',9,'R4','09',1
+exec dbo.createComputer 'LE1-ZP009',9,'R4','11',1
+exec dbo.createComputer 'LE1-ZA005',9,'R4','12',1
+exec dbo.createComputer 'LE1-ZA001',9,'R4','13',1
+exec dbo.createComputer 'LE1-ZP010',9,'R4','15',1
+exec dbo.createComputer 'LE1-ZA004',9,'R4','17',1
+exec dbo.createComputer 'LE1-ZA008',9,'R4','19',1
+exec dbo.createComputer 'LE1-ZA002',9,'R4','06',1
+exec dbo.createComputer 'LE1-ZP014',9,'R4','16',1
+
+-----------------------------------------------------------
+			--R3
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 14
+BEGIN
+  exec dbo.createTisch 120,80,1,'R3','00',1  
+  SET @cnt = @cnt + 1;
+END;
+  
+set @cnt = 0;
+WHILE @cnt < 9
+BEGIN
+  exec dbo.createMonitor 0,1,1,10,'R3','00',1
+  SET @cnt = @cnt + 1;
+END;
+
+exec dbo.createMonitor 1,1,1,16,'R3','00',1
+exec dbo.createBeamer 1,0,1,7,'R3','00',1
+
+exec dbo.createComputer 'LE1-LX011',5,'R3','00',1
+exec dbo.createComputer 'LE1-LX005',5,'R3','01',1
+exec dbo.createComputer 'LE1-ZP002',5,'R3','03',1
+exec dbo.createComputer 'LE1-LX001',5,'R3','04',1
+exec dbo.createComputer 'LE1-LX022',5,'R3','06',1
+exec dbo.createComputer 'LE1-LX010',5,'R3','07',1
+exec dbo.createComputer 'LE1-Z006',5,'R3','10',1
+
+-----------------------------------------------------------
+			--R2
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 7
+BEGIN
+  exec dbo.createTisch 180,80,1,'R2','00',1  
+  SET @cnt = @cnt + 1;
+END;
+  
+set @cnt = 0;
+WHILE @cnt < 5
+BEGIN
+  exec dbo.createMonitor 0,0,1,12,'R2','00',1
+  SET @cnt = @cnt + 1;
+END;
+
+exec dbo.createMonitor 1,1,1,16,'R2','00',1
+exec dbo.createMonitor 1,1,1,16,'R2','00',1
+exec dbo.createMonitor 0,1,1,10,'R2','00',1
+
+exec dbo.createBeamer 1,0,1,7,'R2','00',1
+
+exec dbo.createComputer 'LE1-CM025',9,'R2','12',1
+exec dbo.createComputer 'LE1-CM011',9,'R2','09',1
+exec dbo.createComputer 'LE1-CM015',9,'R2','08',1
+exec dbo.createComputer 'LE1-CM006',9,'R2','05',1
+exec dbo.createComputer 'LE1-CM013',9,'R2','04',1
+exec dbo.createComputer 'LE1-CM019',9,'R2','01',1
+exec dbo.createComputer 'LE1-ZP004',9,'R2','00',1
+
+-----------------------------------------------------------
+			--R1
+-----------------------------------------------------------
+set @cnt=0;
+WHILE @cnt < 11
+BEGIN
+  exec dbo.createTisch 180,80,1,'R1','00',1  
+  SET @cnt = @cnt + 1;
+END;
+  exec dbo.createTisch 80,80,1,'R1','00',1  
+  exec dbo.createTisch 80,80,1,'R1','00',1  
+  exec dbo.createTisch 80,80,1,'R1','00',1  
+  exec dbo.createTisch 80,80,1,'R1','00',1  
+
+set @cnt = 0;
+WHILE @cnt < 15
+BEGIN
+  exec dbo.createMonitor 0,0,1,18,'R1','00',1
+  SET @cnt = @cnt + 1;
+END;
+exec dbo.createMonitor 1,1,1,16,'R1','00',1
+exec dbo.createBeamer 1,0,1,7,'R1','00',1
+
+exec dbo.createComputer 'LE1-IC007',9,'R1','00',1
+exec dbo.createComputer 'LE1-CM010',9,'R1','01',1
+exec dbo.createComputer 'LE1-CM016',9,'R1','03',1
+exec dbo.createComputer 'LE1-LX008',9,'R1','05',1
+exec dbo.createComputer 'LE1-LX016',9,'R1','06',1
+exec dbo.createComputer 'LE1-LX006',9,'R1','09',1
+exec dbo.createComputer 'LE1-LX002',9,'R1','10',1
+exec dbo.createComputer 'LE1-LX017',9,'R1','12',1
+exec dbo.createComputer 'LE1-CM008',9,'R1','14',1
+exec dbo.createComputer 'LE1-LX007',9,'R1','15',1
+exec dbo.createComputer 'LE1-LX009',9,'R1','17',1
+exec dbo.createComputer 'LE1-LX012',9,'R1','19',1
+exec dbo.createComputer 'LE1-LX019',9,'R1','20',1
+exec dbo.createComputer 'LE1-CM038',9,'R1','22',1
+exec dbo.createComputer 'LE1-CM018',9,'R1','24',1
+GO
+
+-----------------------------------------------------------------------------------------
+				--	5 - CRUD INVENTAR PROZEDUREN
+-----------------------------------------------------------------------------------------
+
+CREATE PROCEDURE dbo.getInventar @tabl nvarchar(25),@standort nvarchar(25),@raum nvarchar(20)
+as
+declare @sql nvarchar(355)='Select '+@tabl+'.*,Inventar.*,Hersteller.* from '+@tabl
++' join Inventar on Inventar.InventarId='+@tabl+'.InventarId'
++' join Hersteller on Inventar.HerstellerId=Hersteller.HerstellerId'
++' join Standorte on Inventar.StandortId=Standorte.StandortId'+
+' where Inventar.Raum = '+''''+@raum+''''+' or '+''''+@raum+''''+' = '''' and Standorte.Standortname = '+''''+ @standort+''''
+if @tabl = 'Computer'
+BEGIN
+set @sql=@sql+' order by '+@tabl+'.Computername' 
+END
+exec sp_executesql @sql
+GO
+
+
+CREATE PROCEDURE dbo.getRaum @standort nvarchar(25)
+as
+declare @sql nvarchar(255)='Select distinct raum from Inventar i'+
++' join Standorte s on i.StandortId=s.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.getOrte 
+as
+declare @sql nvarchar(255)='Select Standortname from Standorte'
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.getObjekte 
+as
+declare @sql nvarchar(255)='select Bezeichnung from Kategorie'
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.getPropertiesbyInvId @id nvarchar(10)
+as
+declare @tabl nvarchar(30)
+select @tabl= Kategorie.Bezeichnung from kategorie
+join inventar on Kategorie.KategorieId=Inventar.KategorieId
+where inventar.InventarId=@id
+declare @sql nvarchar(500) ='Select top 1 Inventar.*,Inventartracking.Admin,Hersteller.Herstellername,Standorte.Standortname,'+@tabl+'.* from '+@tabl
++' join Inventar on Inventar.InventarId='+@tabl+'.InventarId'
++' join Hersteller on Inventar.HerstellerId=Hersteller.HerstellerId'
++' join Standorte on Inventar.StandortId=Standorte.StandortId'
++' join Inventartracking on Inventar.InventarId=Inventartracking.InventarId'
++' where Inventar.InventarId='+''''+@id+''''
++' order by Inventartracking.Geaendert desc'
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.updatePos @invid nvarchar(10),@pos nvarchar(10) 
+as
+declare @sql nvarchar(255)='update Inventar set Position='+''''+@pos+''''+'where InventarId='+@invid
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.updateRaum @invid nvarchar(10),@raum nvarchar(30) 
+as
+declare @sql nvarchar(255)='update Inventar set Raum='+''''+@raum+''''+'where InventarId='+@invid
+exec sp_executesql @sql
+GO
+
+CREATE PROCEDURE dbo.deleteObject @invid nvarchar(10) 
+as
+declare @id nvarchar(10)
+select @id=kategorieid from inventar
+where InventarId=@invid
+
+declare @tabl nvarchar(30)
+select @tabl=bezeichnung from Kategorie
+where KategorieId=@id
+
+declare @sql nvarchar(255)='DELETE FROM Inventar WHERE InventarId='+''''+@invid+''''
+exec sp_executesql @sql
+set @sql ='DELETE FROM '+@tabl+' WHERE InventarId='+''''+@invid+''''
+exec sp_executesql @sql
+GO
+
+----------------------------------------------
+update Computer
+set Prozessor='i7-7700K-CPU-4.20GHz', RAM=16,Grafik='Geforce-GT-730',HDD=500,SSD=1000
+where ComputerId=1
+
+GO
+
+update Computer
+set Prozessor='i7-7700K-CPU-4.20GHz', RAM=16,Grafik='Geforce-GT-730',HDD=500,SSD=1000
+where ComputerId=2
+
+GO
+
+update Computer
+set Prozessor='i7-7700K-CPU-4.20GHz', RAM=16,Grafik='Geforce-GT-730',HDD=500,SSD=1000
+where ComputerId=4
+
+GO
+
+update Computer
+set Prozessor='i7-7700K-CPU-4.20GHz', RAM=16,Grafik='Geforce-GT-730',HDD=500,SSD=1000
+where ComputerId=13
+
+--
+GO
+
+update Computer
+set Prozessor='i3-7100K-CPU-3.90GHz', RAM=8,Grafik='Geforce-GT-630',HDD=500,SSD=250
+where ComputerId=4
+
+GO
+
+update Computer
+set Prozessor='i3-7100K-CPU-3.90GHz', RAM=8,Grafik='Geforce-GT-630',HDD=500,SSD=250
+where ComputerId=6
+
+GO
+
+update Computer
+set Prozessor='i3-7100K-CPU-3.90GHz', RAM=8,Grafik='Geforce-GT-630',HDD=500,SSD=250
+where ComputerId=11
+
+GO
+
+update Computer
+set Prozessor='i3-7100K-CPU-3.90GHz', RAM=8,Grafik='Geforce-GT-630',HDD=500,SSD=250
+where ComputerId=14
+
+
+--NEU MIT EIGENSCHAFTEN--------------------------------
+GO
+
+CREATE PROCEDURE dbo.getcpu @standort nvarchar(25)
+as
+declare @sql nvarchar(300)='Select distinct prozessor from Computer c'+
++' join Inventar i on i.InventarId=c.InventarId'+
++' join Standorte s on s.StandortId=i.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+CREATE PROCEDURE dbo.getram @standort nvarchar(25)
+as
+declare @sql nvarchar(300)='Select distinct RAM from Computer c'+
++' join Inventar i on i.InventarId=c.InventarId'+
++' join Standorte s on s.StandortId=i.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+CREATE PROCEDURE dbo.getgrafik @standort nvarchar(25)
+as
+declare @sql nvarchar(300)='Select distinct Grafik from Computer c'+
++' join Inventar i on i.InventarId=c.InventarId'+
++' join Standorte s on s.StandortId=i.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+CREATE PROCEDURE dbo.gethdd @standort nvarchar(25)
+as
+declare @sql nvarchar(300)='Select distinct HDD from Computer c'+
++' join Inventar i on i.InventarId=c.InventarId'+
++' join Standorte s on s.StandortId=i.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+CREATE PROCEDURE dbo.getssd @standort nvarchar(25)
+as
+declare @sql nvarchar(300)='Select distinct SSD from Computer c'+
++' join Inventar i on i.InventarId=c.InventarId'+
++' join Standorte s on s.StandortId=i.StandortId'+
+' where s.Standortname = '+''''+ @standort+''''
+
+exec sp_executesql @sql
+GO
+
+--------------------------------------FILTER Prozedur-------
+CREATE PROCEDURE dbo.getComputer @standort nvarchar(25),@raum nvarchar(20),@cpu nvarchar(40),@ram nvarchar(40),@hdd nvarchar(20), @ssd nvarchar(20),@grafik nvarchar(30)
+as
+declare @sql nvarchar(1000)='Select Computer.*,Inventar.*,Hersteller.* from Computer'
++' join Inventar on Inventar.InventarId=Computer.InventarId'
++' join Hersteller on Inventar.HerstellerId=Hersteller.HerstellerId'
++' join Standorte on Inventar.StandortId=Standorte.StandortId'+
+' where (Inventar.Raum = '+''''+@raum+''''+' or '+''''+@raum+'''' +' = '''') '+
+' and (Computer.Prozessor = '+''''+@cpu+''''+' or '+''''+@cpu+''''+' = '''') '+
+' and (Computer.RAM = '+''''+@ram+''''+' or '+''''+@ram+''''+' = '''') '+
+' and (Computer.HDD = '+''''+@hdd+''''+' or '+''''+@hdd+''''+' = '''') '+
+' and (Computer.SSD = '+''''+@ssd+''''+' or '+''''+@ssd+''''+' = '''') '+
+' and (Computer.Grafik = '+''''+@grafik+''''+' or '+''''+@grafik+''''+' = '''') and Standorte.Standortname = '+''''+ @standort+''''
++' order by Computer.Computername'
+exec sp_executesql @sql
+GO

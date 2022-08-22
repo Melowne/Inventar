@@ -1,0 +1,17 @@
+{
+  "version": 2,
+  "dgSpecHash": "gchkUi5FWN0wZS2Al0RdFhXTN5qEXeEzaOwsd/dJJtOgdI9I6yMEyil+pB6b2bJbkZ8J/nF6sOUi8ewIqV6kOw==",
+  "success": true,
+  "projectFilePath": "E:\\Workspacesc#\\Inventarverwaltung\\Inventarverwaltung_iad\\Inventarverwaltung_iad\\Inventarverwaltung_iad.iOS\\Inventarverwaltung_iad.iOS.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Melowne\\.nuget\\packages\\acr.userdialogs\\7.2.0.562\\acr.userdialogs.7.2.0.562.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\btprogresshud\\1.3.5\\btprogresshud.1.3.5.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\system.data.sqlclient\\4.8.3\\system.data.sqlclient.4.8.3.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\xamarin.essentials\\1.7.0\\xamarin.essentials.1.7.0.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\xamarin.forms\\5.0.0.2196\\xamarin.forms.5.0.0.2196.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\zxing.net.mobile\\2.4.1\\zxing.net.mobile.2.4.1.nupkg.sha512",
+    "C:\\Users\\Melowne\\.nuget\\packages\\zxing.net.mobile.forms\\2.4.1\\zxing.net.mobile.forms.2.4.1.nupkg.sha512"
+  ],
+  "logs": []
+}
